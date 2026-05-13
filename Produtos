@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Estoque | Alimentos e Limpeza</title>
+  <style>
+    :root {
+      --azul-escuro: #0f3c68;
+      --azul-medio: #1e75b9;
+      --azul-claro: #e8f3fc;
+      --azul-suave: #f4f9fd;
+      --branco: #ffffff;
+      --cinza: #6b7280;
+      --cinza-claro: #e5e7eb;
+      --verde: #15803d;
+      --vermelho: #b91c1c;
+      --sombra: 0 10px 25px rgba(15, 60, 104, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, var(--azul-claro), var(--azul-suave));
+      color: #1f2937;
+    }
+
+    header {
+      background: var(--azul-escuro);
+      color: var(--branco);
+      padding: 26px 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      font-size: 15px;
+      opacity: 0.92;
+    }
+
+    main {
+      width: min(1150px, 94%);
+      margin: 28px auto;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .tab-button {
+      border: none;
+      background: var(--branco);
+      color: var(--azul-escuro);
+      padding: 12px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: var(--sombra);
+      transition: 0.2s;
+    }
+
+    .tab-button.active,
+    .tab-button:hover {
+      background: var(--azul-medio);
+      color: var(--branco);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--branco);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--sombra);
+      margin-bottom: 22px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: var(--azul-escuro);
+      font-size: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: var(--azul-escuro);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--cinza-claro);
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      background: #fbfdff;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--azul-medio);
+      box-shadow: 0 0 0 3px rgba(30, 117, 185, 0.12);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    button.submit,
+    button.secondary {
+      margin-top: 18px;
+      background: var(--azul-medio);
+      color: var(--branco);
+      border: none;
+      border-radius: 14px;
+      padding: 13px 22px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    button.secondary {
+      background: var(--azul-escuro);
+      margin-top: 0;
+    }
+
+    button.submit:hover,
+    button.secondary:hover {
+      filter: brightness(0.92);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .summary-box {
+      background: var(--branco);
+      border-left: 6px solid var(--azul-medio);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--sombra);
+    }
+
+    .summary-box h3 {
+      margin: 0 0 8px;
+      color: var(--azul-escuro);
+      font-size: 15px;
+    }
+
+    .summary-box strong {
+      font-size: 28px;
+      color: var(--azul-medio);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--cinza-claro);
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--azul-escuro);
+      color: var(--branco);
+    }
+
+    tr:nth-child(even) {
+      background: #f8fbff;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 2px 0;
+    }
+
+    .ok {
+      background: #dcfce7;
+      color: var(--verde);
+    }
+
+    .alerta {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .vencido {
+      background: #fee2e2;
+      color: var(--vermelho);
+    }
+
+    .entrada {
+      background: #dbeafe;
+      color: var(--azul-escuro);
+    }
+
+    .saida {
+      background: #f3e8ff;
+      color: #6b21a8;
+    }
+
+    .retirado {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .message {
+      display: none;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    .message.success {
+      display: block;
+      background: #dcfce7;
+      color: var(--verde);
+    }
+
+    .message.error {
+      display: block;
+      background: #fee2e2;
+      color: var(--vermelho);
+    }
+
+    .small-note {
+      color: var(--cinza);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 800px) {
+      .form-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Controle de Estoque</h1>
+    <p>Alimentos e materiais de limpeza com baixa automática por validade mais próxima</p>
+  </header>
+
+  <main>
+    <div class="tabs">
+      <button class="tab-button active" onclick="openTab(event, 'entrada')">Entrada</button>
+      <button class="tab-button" onclick="openTab(event, 'saida')">Saída</button>
+      <button class="tab-button" onclick="openTab(event, 'resumo')">Resumo do Estoque</button>
+      <button class="tab-button" onclick="openTab(event, 'consulta')">Consulta por Produto</button>
+    </div>
+
+    <section id="entrada" class="tab-content active">
+      <div class="card">
+        <h2>Registro de Entrada</h2>
+        <p class="small-note">Cada unidade cadastrada recebe um código interno. Exemplo: se registrar 3 arroz, o sistema cria 3 unidades individuais no estoque.</p>
+
+        <form id="formEntrada">
+          <div class="form-grid">
+            <div>
+              <label for="categoriaEntrada">Categoria</label>
+              <select id="categoriaEntrada" required>
+                <option value="">Selecione</option>
+                <option value="Alimento">Alimento</option>
+                <option value="Material de limpeza">Material de limpeza</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="tipoEntrada">Tipo de alimento ou material</label>
+              <input type="text" id="tipoEntrada" placeholder="Ex.: arroz, feijão, detergente" required />
+            </div>
+
+            <div>
+              <label for="quantidadeEntrada">Quantidade</label>
+              <input type="number" id="quantidadeEntrada" min="1" required />
+            </div>
+
+            <div>
+              <label for="validadeEntrada">Data de validade</label>
+              <input type="date" id="validadeEntrada" required />
+            </div>
+          </div>
+
+          <button class="submit" type="submit">Salvar entrada</button>
+          <div id="msgEntrada" class="message"></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="saida" class="tab-content">
+      <div class="card">
+        <h2>Registro de Saída</h2>
+        <p class="small-note">A saída será feita somente a partir dos produtos disponíveis no estoque. O sistema baixa primeiro as unidades com validade mais próxima.</p>
+
+        <form id="formSaida">
+          <div class="form-grid">
+            <div>
+              <label for="produtoSaida">Produto disponível</label>
+              <select id="produtoSaida" required onchange="atualizarInfoProdutoSaida()">
+                <option value="">Selecione um produto</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="modoSaida">Modo de saída</label>
+              <select id="modoSaida" required onchange="atualizarInfoProdutoSaida()">
+                <option value="automatico">Automático: validade mais próxima</option>
+                <option value="manual">Manual: escolher validade/lote</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="loteSaida">Validade/lote para saída manual</label>
+              <select id="loteSaida" onchange="atualizarInfoLoteSaida()" disabled>
+                <option value="">Selecione o produto primeiro</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="quantidadeDisponivelSaida">Quantidade disponível</label>
+              <input type="number" id="quantidadeDisponivelSaida" readonly />
+            </div>
+
+            <div>
+              <label for="validadeMaisProximaSaida">Validade usada na saída</label>
+              <input type="text" id="validadeMaisProximaSaida" readonly />
+            </div>
+
+            <div>
+              <label for="quantidadeSaida">Quantidade para saída</label>
+              <input type="number" id="quantidadeSaida" min="1" required />
+            </div>
+
+            <div>
+              <label for="responsavelSaida">Responsável pela retirada</label>
+              <input type="text" id="responsavelSaida" placeholder="Nome de quem retirou" />
+            </div>
+
+            <div>
+              <label for="setorDestinoSaida">Setor ou destino</label>
+              <input type="text" id="setorDestinoSaida" placeholder="Ex.: cozinha, sala 2, banheiro, evento" />
+            </div>
+
+            <div>
+              <label for="observacaoSaida">Observação</label>
+              <input type="text" id="observacaoSaida" placeholder="Ex.: retirada fora da ordem de validade" />
+            </div>
+
+            <div class="full">
+              <label for="finalidadeSaida">Finalidade da saída</label>
+              <textarea id="finalidadeSaida" placeholder="Ex.: uso na cozinha, limpeza das salas, doação, evento escolar" required></textarea>
+            </div>
+          </div>
+
+          <button class="submit" type="submit">Registrar saída e baixar do estoque</button>
+          <div id="msgSaida" class="message"></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="resumo" class="tab-content">
+      <div class="summary-grid">
+        <div class="summary-box">
+          <h3>Total de itens em estoque</h3>
+          <strong id="totalItens">0</strong>
+        </div>
+        <div class="summary-box">
+          <h3>Itens perto do vencimento</h3>
+          <strong id="totalProximos">0</strong>
+        </div>
+        <div class="summary-box">
+          <h3>Itens vencidos</h3>
+          <strong id="totalVencidos">0</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Quantidade por produto</h2>
+        <p class="small-note">A coluna Situação mostra a quantidade específica dentro da validade, perto de vencer e vencida.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Produto</th>
+              <th>Quantidade atual</th>
+              <th>Validade mais próxima</th>
+              <th>Situação detalhada</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaResumo"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="consulta" class="tab-content">
+      <div class="card">
+        <h2>Consulta por Produto</h2>
+        <p class="small-note">Digite o nome do produto para visualizar cada unidade individualmente, inclusive se ela está disponível ou já foi retirada.</p>
+
+        <div class="summary-grid">
+          <div class="summary-box">
+            <h3>Quantidade atual disponível</h3>
+            <strong id="quantidadeAtualConsulta">0</strong>
+          </div>
+          <div class="summary-box">
+            <h3>Unidades cadastradas</h3>
+            <strong id="entradasConsulta">0</strong>
+          </div>
+          <div class="summary-box">
+            <h3>Unidades retiradas</h3>
+            <strong id="saidasConsulta">0</strong>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label for="buscaProduto">Buscar por tipo de alimento ou material</label>
+            <input type="text" id="buscaProduto" placeholder="Ex.: arroz" oninput="consultarProduto()" />
+          </div>
+
+          <div>
+            <label for="filtroMovimento">Filtrar por status</label>
+            <select id="filtroMovimento" onchange="consultarProduto()">
+              <option value="todos">Disponíveis e retirados</option>
+              <option value="Disponível">Apenas disponíveis</option>
+              <option value="Retirado">Apenas retirados</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="ordemValidade">Ordem de validade</label>
+            <select id="ordemValidade" onchange="consultarProduto()">
+              <option value="registro">Ordem de registro</option>
+              <option value="validadeProxima">Validade mais próxima primeiro</option>
+              <option value="validadeDistante">Validade mais distante primeiro</option>
+            </select>
+          </div>
+
+          <div style="display: flex; align-items: end;">
+            <button class="secondary" type="button" onclick="limparBusca()">Limpar busca</button>
+          </div>
+        </div>
+
+        <br>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Data de entrada</th>
+              <th>Categoria</th>
+              <th>Produto</th>
+              <th>Validade</th>
+              <th>Status</th>
+              <th>Situação</th>
+              <th>Data da saída</th>
+              <th>Responsável</th>
+              <th>Finalidade</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaConsulta"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhzMf4cS3hh1hDv-xiFn3ShYN_-PkZET7olV5QSDA4rns9RVy0bdQYv7Ocz3vhkuWy-Q/exec";
+
+    let unidades = JSON.parse(localStorage.getItem("unidadesEstoque")) || [];
+
+    function openTab(event, tabId) {
+      document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+
+      document.getElementById(tabId).classList.add("active");
+      event.target.classList.add("active");
+
+      if (tabId === "saida") carregarProdutosDisponiveisSaida();
+      if (tabId === "resumo") atualizarResumo();
+      if (tabId === "consulta") consultarProduto();
+    }
+
+    function salvarUnidades() {
+      localStorage.setItem("unidadesEstoque", JSON.stringify(unidades));
+    }
+
+    function gerarCodigoUnidade() {
+      return "UND-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+    }
+
+    async function enviarParaPlanilha(dados) {
+      if (!SCRIPT_URL || SCRIPT_URL === "COLE_AQUI_A_URL_DO_APPS_SCRIPT") {
+        console.warn("URL do Apps Script ainda não configurada. O dado foi salvo apenas no navegador.");
+        return;
+      }
+
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+    }
+
+    function mostrarMensagem(elementoId, texto, tipo) {
+      const elemento = document.getElementById(elementoId);
+      elemento.textContent = texto;
+      elemento.className = `message ${tipo}`;
+      setTimeout(() => {
+        elemento.className = "message";
+        elemento.textContent = "";
+      }, 4500);
+    }
+
+    document.getElementById("formEntrada").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const categoria = document.getElementById("categoriaEntrada").value;
+      const tipo = document.getElementById("tipoEntrada").value.trim();
+      const quantidade = Number(document.getElementById("quantidadeEntrada").value);
+      const validade = document.getElementById("validadeEntrada").value;
+      const dataRegistro = new Date().toLocaleString("pt-BR");
+
+      for (let i = 1; i <= quantidade; i++) {
+        const unidade = {
+          codigo: gerarCodigoUnidade(),
+          dataEntrada: dataRegistro,
+          categoria,
+          tipo,
+          validade,
+          status: "Disponível",
+          dataSaida: "",
+          finalidade: "",
+          responsavel: ""
+        };
+
+        unidades.push(unidade);
+
+        await enviarParaPlanilha({
+          movimento: "Entrada",
+          codigo: unidade.codigo,
+          dataRegistro: unidade.dataEntrada,
+          categoria: unidade.categoria,
+          tipo: unidade.tipo,
+          quantidade: 1,
+          validade: unidade.validade,
+          status: unidade.status,
+          finalidade: "",
+          responsavel: ""
+        });
+      }
+
+      salvarUnidades();
+      mostrarMensagem("msgEntrada", `${quantidade} unidade(s) cadastrada(s) com sucesso.`, "success");
+      this.reset();
+      carregarProdutosDisponiveisSaida();
+    });
+
+    function getProdutosDisponiveisAgrupados() {
+      const agrupados = {};
+
+      unidades
+        .filter(item => item.status === "Disponível")
+        .forEach(item => {
+          const chave = `${item.categoria}|${item.tipo}`;
+          if (!agrupados[chave]) {
+            agrupados[chave] = {
+              chave,
+              categoria: item.categoria,
+              tipo: item.tipo,
+              quantidade: 0,
+              validadeMaisProxima: item.validade
+            };
+          }
+
+          agrupados[chave].quantidade++;
+
+          if (new Date(item.validade) < new Date(agrupados[chave].validadeMaisProxima)) {
+            agrupados[chave].validadeMaisProxima = item.validade;
+          }
+        });
+
+      return Object.values(agrupados).sort((a, b) => a.tipo.localeCompare(b.tipo));
+    }
+
+    function carregarProdutosDisponiveisSaida() {
+      const select = document.getElementById("produtoSaida");
+      const produtos = getProdutosDisponiveisAgrupados();
+
+      select.innerHTML = `<option value="">Selecione um produto</option>`;
+
+      produtos.forEach(produto => {
+        const option = document.createElement("option");
+        option.value = produto.chave;
+        option.textContent = `${produto.tipo} | ${produto.categoria} | Disponível: ${produto.quantidade} | Validade mais próxima: ${formatarData(produto.validadeMaisProxima)}`;
+        select.appendChild(option);
+      });
+
+      atualizarInfoProdutoSaida();
+    }
+
+    function atualizarInfoProdutoSaida() {
+      const chave = document.getElementById("produtoSaida").value;
+      const modoSaida = document.getElementById("modoSaida").value;
+      const produto = getProdutosDisponiveisAgrupados().find(item => item.chave === chave);
+      const loteSelect = document.getElementById("loteSaida");
+
+      loteSelect.innerHTML = `<option value="">Selecione o produto primeiro</option>`;
+      loteSelect.disabled = modoSaida !== "manual";
+
+      if (!produto) {
+        document.getElementById("quantidadeDisponivelSaida").value = "";
+        document.getElementById("validadeMaisProximaSaida").value = "";
+        document.getElementById("quantidadeSaida").max = "";
+        return;
+      }
+
+      if (modoSaida === "automatico") {
+        document.getElementById("quantidadeDisponivelSaida").value = produto.quantidade;
+        document.getElementById("validadeMaisProximaSaida").value = formatarData(produto.validadeMaisProxima);
+        document.getElementById("quantidadeSaida").max = produto.quantidade;
+        loteSelect.innerHTML = `<option value="">Saída automática pela validade mais próxima</option>`;
+        return;
+      }
+
+      const [categoria, tipo] = chave.split("|");
+      const lotes = getLotesDisponiveis(categoria, tipo);
+
+      loteSelect.innerHTML = `<option value="">Selecione uma validade/lote</option>`;
+      lotes.forEach(lote => {
+        const option = document.createElement("option");
+        option.value = lote.validade;
+        option.textContent = `${formatarData(lote.validade)} | Disponível: ${lote.quantidade}`;
+        loteSelect.appendChild(option);
+      });
+
+      document.getElementById("quantidadeDisponivelSaida").value = "";
+      document.getElementById("validadeMaisProximaSaida").value = "";
+      document.getElementById("quantidadeSaida").max = "";
+    }
+
+    function getLotesDisponiveis(categoria, tipo) {
+      const lotes = {};
+
+      unidades
+        .filter(item => item.status === "Disponível" && item.categoria === categoria && item.tipo === tipo)
+        .forEach(item => {
+          if (!lotes[item.validade]) {
+            lotes[item.validade] = {
+              validade: item.validade,
+              quantidade: 0
+            };
+          }
+          lotes[item.validade].quantidade++;
+        });
+
+      return Object.values(lotes).sort((a, b) => new Date(a.validade) - new Date(b.validade));
+    }
+
+    function atualizarInfoLoteSaida() {
+      const chave = document.getElementById("produtoSaida").value;
+      const validadeSelecionada = document.getElementById("loteSaida").value;
+
+      if (!chave || !validadeSelecionada) {
+        document.getElementById("quantidadeDisponivelSaida").value = "";
+        document.getElementById("validadeMaisProximaSaida").value = "";
+        document.getElementById("quantidadeSaida").max = "";
+        return;
+      }
+
+      const [categoria, tipo] = chave.split("|");
+      const lote = getLotesDisponiveis(categoria, tipo).find(item => item.validade === validadeSelecionada);
+
+      document.getElementById("quantidadeDisponivelSaida").value = lote ? lote.quantidade : "";
+      document.getElementById("validadeMaisProximaSaida").value = lote ? formatarData(lote.validade) : "";
+      document.getElementById("quantidadeSaida").max = lote ? lote.quantidade : "";
+    }
+
+    document.getElementById("formSaida").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const chave = document.getElementById("produtoSaida").value;
+      const quantidadeParaSair = Number(document.getElementById("quantidadeSaida").value);
+      const modoSaida = document.getElementById("modoSaida").value;
+      const validadeManual = document.getElementById("loteSaida").value;
+      const finalidade = document.getElementById("finalidadeSaida").value.trim();
+      const responsavel = document.getElementById("responsavelSaida").value.trim();
+      const setorDestino = document.getElementById("setorDestinoSaida").value.trim();
+      const observacao = document.getElementById("observacaoSaida").value.trim();
+      const dataSaida = new Date().toLocaleString("pt-BR");
+
+      if (!chave) {
+        mostrarMensagem("msgSaida", "Selecione um produto disponível.", "error");
+        return;
+      }
+
+      const [categoria, tipo] = chave.split("|");
+
+      let disponiveis = unidades
+        .filter(item => item.status === "Disponível" && item.categoria === categoria && item.tipo === tipo)
+        .sort((a, b) => new Date(a.validade) - new Date(b.validade));
+
+      if (modoSaida === "manual") {
+        if (!validadeManual) {
+          mostrarMensagem("msgSaida", "Selecione a validade/lote para a saída manual.", "error");
+          return;
+        }
+
+        disponiveis = disponiveis.filter(item => item.validade === validadeManual);
+      }
+
+      if (quantidadeParaSair > disponiveis.length) {
+        mostrarMensagem("msgSaida", "A quantidade solicitada é maior que a quantidade disponível.", "error");
+        return;
+      }
+
+      const unidadesBaixadas = disponiveis.slice(0, quantidadeParaSair);
+
+      for (const unidade of unidadesBaixadas) {
+        unidade.status = "Retirado";
+        unidade.dataSaida = dataSaida;
+        unidade.finalidade = finalidade;
+        unidade.responsavel = responsavel;
+        unidade.setorDestino = setorDestino;
+        unidade.observacao = observacao;
+        unidade.modoSaida = modoSaida === "automatico" ? "Automático" : "Manual";
+
+        await enviarParaPlanilha({
+          movimento: "Saída",
+          codigo: unidade.codigo,
+          dataRegistro: dataSaida,
+          categoria: unidade.categoria,
+          tipo: unidade.tipo,
+          quantidade: 1,
+          validade: unidade.validade,
+          status: unidade.status,
+          finalidade: unidade.finalidade,
+          responsavel: unidade.responsavel,
+          setorDestino: unidade.setorDestino,
+          observacao: unidade.observacao,
+          modoSaida: unidade.modoSaida
+        });
+      }
+
+      salvarUnidades();
+      mostrarMensagem("msgSaida", `${quantidadeParaSair} unidade(s) retirada(s) do estoque com sucesso.`, "success");
+      this.reset();
+      carregarProdutosDisponiveisSaida();
+      atualizarResumo();
+    });
+
+    function atualizarResumo() {
+      const disponiveis = unidades.filter(item => item.status === "Disponível");
+      const agrupados = {};
+
+      disponiveis.forEach(item => {
+        const chave = `${item.categoria}|${item.tipo}`;
+        if (!agrupados[chave]) {
+          agrupados[chave] = {
+            categoria: item.categoria,
+            tipo: item.tipo,
+            unidades: []
+          };
+        }
+        agrupados[chave].unidades.push(item);
+      });
+
+      const tabela = document.getElementById("tabelaResumo");
+      tabela.innerHTML = "";
+
+      let totalItens = 0;
+      let totalProximos = 0;
+      let totalVencidos = 0;
+
+      Object.values(agrupados).forEach(produto => {
+        produto.unidades.sort((a, b) => new Date(a.validade) - new Date(b.validade));
+
+        const contagem = { ok: 0, alerta: 0, vencido: 0 };
+
+        produto.unidades.forEach(item => {
+          const situacao = verificarValidade(item.validade);
+          contagem[situacao.classe]++;
+        });
+
+        totalItens += produto.unidades.length;
+        totalProximos += contagem.alerta;
+        totalVencidos += contagem.vencido;
+
+        const linha = document.createElement("tr");
+        linha.innerHTML = `
+          <td>${produto.categoria}</td>
+          <td>${produto.tipo}</td>
+          <td>${produto.unidades.length}</td>
+          <td>${formatarData(produto.unidades[0].validade)}</td>
+          <td>
+            <span class="badge ok">${contagem.ok} dentro da validade</span><br>
+            <span class="badge alerta">${contagem.alerta} perto de vencer</span><br>
+            <span class="badge vencido">${contagem.vencido} vencido(s)</span>
+          </td>
+        `;
+        tabela.appendChild(linha);
+      });
+
+      document.getElementById("totalItens").textContent = totalItens;
+      document.getElementById("totalProximos").textContent = totalProximos;
+      document.getElementById("totalVencidos").textContent = totalVencidos;
+
+      if (!tabela.innerHTML) {
+        tabela.innerHTML = `<tr><td colspan="5">Nenhum item disponível em estoque no momento.</td></tr>`;
+      }
+    }
+
+    function consultarProduto() {
+      const termo = document.getElementById("buscaProduto").value.trim().toLowerCase();
+      const filtroStatus = document.getElementById("filtroMovimento").value;
+      const ordemValidade = document.getElementById("ordemValidade").value;
+      const tabela = document.getElementById("tabelaConsulta");
+      tabela.innerHTML = "";
+
+      document.getElementById("quantidadeAtualConsulta").textContent = 0;
+      document.getElementById("entradasConsulta").textContent = 0;
+      document.getElementById("saidasConsulta").textContent = 0;
+
+      if (!termo) {
+        tabela.innerHTML = `<tr><td colspan="10">Digite o nome de um produto para consultar os registros.</td></tr>`;
+        return;
+      }
+
+      let resultado = unidades.filter(item => item.tipo.toLowerCase().includes(termo));
+
+      const quantidadeDisponivel = resultado.filter(item => item.status === "Disponível").length;
+      const quantidadeCadastrada = resultado.length;
+      const quantidadeRetirada = resultado.filter(item => item.status === "Retirado").length;
+
+      document.getElementById("quantidadeAtualConsulta").textContent = quantidadeDisponivel;
+      document.getElementById("entradasConsulta").textContent = quantidadeCadastrada;
+      document.getElementById("saidasConsulta").textContent = quantidadeRetirada;
+
+      if (filtroStatus !== "todos") {
+        resultado = resultado.filter(item => item.status === filtroStatus);
+      }
+
+      if (ordemValidade === "validadeProxima") {
+        resultado.sort((a, b) => new Date(a.validade) - new Date(b.validade));
+      }
+
+      if (ordemValidade === "validadeDistante") {
+        resultado.sort((a, b) => new Date(b.validade) - new Date(a.validade));
+      }
+
+      if (resultado.length === 0) {
+        tabela.innerHTML = `<tr><td colspan="10">Nenhum registro encontrado para esta busca ou filtro selecionado.</td></tr>`;
+        return;
+      }
+
+      resultado.forEach(item => {
+        const situacao = item.status === "Retirado" ? { texto: "Retirado do estoque", classe: "retirado" } : verificarValidade(item.validade);
+        const statusClasse = item.status === "Disponível" ? "ok" : "retirado";
+
+        const linha = document.createElement("tr");
+        linha.innerHTML = `
+          <td>${item.codigo}</td>
+          <td>${item.dataEntrada}</td>
+          <td>${item.categoria}</td>
+          <td>${item.tipo}</td>
+          <td>${formatarData(item.validade)}</td>
+          <td><span class="badge ${statusClasse}">${item.status}</span></td>
+          <td><span class="badge ${situacao.classe}">${situacao.texto}</span></td>
+          <td>${item.dataSaida || "-"}</td>
+          <td>${item.responsavel || "-"}</td>
+          <td>${item.finalidade || "-"}</td>
+        `;
+        tabela.appendChild(linha);
+      });
+    }
+
+    function limparBusca() {
+      document.getElementById("buscaProduto").value = "";
+      document.getElementById("filtroMovimento").value = "todos";
+      document.getElementById("ordemValidade").value = "registro";
+      consultarProduto();
+    }
+
+    function verificarValidade(dataValidade) {
+      if (!dataValidade) return { texto: "Sem validade", classe: "ok" };
+
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+
+      const validade = new Date(dataValidade + "T00:00:00");
+      const diferencaDias = Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
+
+      if (diferencaDias < 0) return { texto: "Vencido", classe: "vencido" };
+      if (diferencaDias <= 30) return { texto: "Perto de vencer", classe: "alerta" };
+      return { texto: "Dentro da validade", classe: "ok" };
+    }
+
+    function formatarData(data) {
+      if (!data) return "-";
+      const [ano, mes, dia] = data.split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    carregarProdutosDisponiveisSaida();
+    atualizarResumo();
+  </script>
+</body>
+</html>
