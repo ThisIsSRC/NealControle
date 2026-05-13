@@ -3,19 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Controle de Estoque | Alimentos e Limpeza</title>
+  <title>Controle de Estoque | Dashboard</title>
   <style>
     :root {
-      --azul-escuro: #0f3c68;
-      --azul-medio: #1e75b9;
-      --azul-claro: #e8f3fc;
-      --azul-suave: #f4f9fd;
+      --azul-950: #082f49;
+      --azul-900: #0f3c68;
+      --azul-700: #1d6fb8;
+      --azul-500: #2b96dd;
+      --azul-100: #e8f3fc;
+      --azul-50: #f4f9fd;
       --branco: #ffffff;
-      --cinza: #6b7280;
-      --cinza-claro: #e5e7eb;
+      --texto: #1f2937;
+      --muted: #6b7280;
+      --borda: #e5e7eb;
       --verde: #15803d;
+      --verde-bg: #dcfce7;
       --vermelho: #b91c1c;
-      --sombra: 0 10px 25px rgba(15, 60, 104, 0.12);
+      --vermelho-bg: #fee2e2;
+      --amarelo: #92400e;
+      --amarelo-bg: #fef3c7;
+      --roxo: #6b21a8;
+      --roxo-bg: #f3e8ff;
+      --cinza-bg: #f3f4f6;
+      --sombra: 0 18px 45px rgba(8, 47, 73, 0.12);
+      --sombra-suave: 0 10px 25px rgba(8, 47, 73, 0.08);
+      --raio: 22px;
     }
 
     * {
@@ -25,78 +37,120 @@
 
     body {
       margin: 0;
-      background: linear-gradient(135deg, var(--azul-claro), var(--azul-suave));
-      color: #1f2937;
+      color: var(--texto);
+      background:
+        radial-gradient(circle at top left, rgba(43, 150, 221, 0.20), transparent 32%),
+        linear-gradient(135deg, var(--azul-50), #ffffff 45%, var(--azul-100));
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      width: min(1220px, 94%);
+      margin: 24px auto 40px;
     }
 
     header {
-      background: var(--azul-escuro);
+      background: linear-gradient(135deg, var(--azul-950), var(--azul-700));
       color: var(--branco);
-      padding: 26px 18px;
-      text-align: center;
+      padding: 30px;
+      border-radius: 30px;
+      box-shadow: var(--sombra);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      right: -80px;
+      top: -110px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
     }
 
     header h1 {
       margin: 0;
-      font-size: 28px;
+      font-size: clamp(26px, 4vw, 38px);
+      letter-spacing: -0.8px;
     }
 
     header p {
-      margin: 8px 0 0;
+      margin: 10px 0 0;
       font-size: 15px;
       opacity: 0.92;
-    }
-
-    main {
-      width: min(1150px, 94%);
-      margin: 28px auto;
+      max-width: 720px;
+      line-height: 1.5;
     }
 
     .tabs {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 18px;
+      margin: 20px 0;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(229, 231, 235, 0.9);
+      border-radius: 999px;
+      box-shadow: var(--sombra-suave);
+      backdrop-filter: blur(10px);
     }
 
     .tab-button {
       border: none;
-      background: var(--branco);
-      color: var(--azul-escuro);
-      padding: 12px 18px;
+      background: transparent;
+      color: var(--azul-900);
+      padding: 12px 17px;
       border-radius: 999px;
       cursor: pointer;
-      font-weight: bold;
-      box-shadow: var(--sombra);
+      font-weight: 700;
       transition: 0.2s;
     }
 
     .tab-button.active,
     .tab-button:hover {
-      background: var(--azul-medio);
+      background: var(--azul-700);
       color: var(--branco);
+      box-shadow: 0 8px 16px rgba(29, 111, 184, 0.25);
     }
 
     .tab-content {
       display: none;
+      animation: aparecer 0.25s ease;
     }
 
     .tab-content.active {
       display: block;
     }
 
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .card {
-      background: var(--branco);
-      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(229, 231, 235, 0.9);
+      border-radius: var(--raio);
       padding: 24px;
-      box-shadow: var(--sombra);
+      box-shadow: var(--sombra-suave);
       margin-bottom: 22px;
     }
 
     .card h2 {
-      margin-top: 0;
-      color: var(--azul-escuro);
-      font-size: 22px;
+      margin: 0 0 8px;
+      color: var(--azul-950);
+      font-size: 23px;
+      letter-spacing: -0.2px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
     }
 
     .form-grid {
@@ -107,28 +161,31 @@
 
     label {
       display: block;
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: var(--azul-escuro);
+      font-weight: 700;
+      margin-bottom: 7px;
+      color: var(--azul-900);
+      font-size: 14px;
     }
 
     input,
     select,
     textarea {
       width: 100%;
-      padding: 12px;
-      border: 1px solid var(--cinza-claro);
-      border-radius: 12px;
+      padding: 13px 14px;
+      border: 1px solid var(--borda);
+      border-radius: 14px;
       font-size: 15px;
       outline: none;
       background: #fbfdff;
+      transition: 0.2s;
     }
 
     input:focus,
     select:focus,
     textarea:focus {
-      border-color: var(--azul-medio);
-      box-shadow: 0 0 0 3px rgba(30, 117, 185, 0.12);
+      border-color: var(--azul-500);
+      box-shadow: 0 0 0 4px rgba(43, 150, 221, 0.14);
+      background: var(--branco);
     }
 
     textarea {
@@ -143,72 +200,101 @@
     button.submit,
     button.secondary {
       margin-top: 18px;
-      background: var(--azul-medio);
+      background: linear-gradient(135deg, var(--azul-700), var(--azul-500));
       color: var(--branco);
       border: none;
-      border-radius: 14px;
+      border-radius: 15px;
       padding: 13px 22px;
       cursor: pointer;
-      font-weight: bold;
+      font-weight: 800;
       font-size: 15px;
       transition: 0.2s;
+      box-shadow: 0 10px 22px rgba(29, 111, 184, 0.22);
     }
 
     button.secondary {
-      background: var(--azul-escuro);
+      background: var(--azul-950);
       margin-top: 0;
     }
 
     button.submit:hover,
     button.secondary:hover {
-      filter: brightness(0.92);
+      transform: translateY(-1px);
+      filter: brightness(0.98);
     }
 
-    .summary-grid {
+    .summary-grid,
+    .dashboard-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
       margin-bottom: 22px;
     }
 
     .summary-box {
-      background: var(--branco);
-      border-left: 6px solid var(--azul-medio);
-      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(229, 231, 235, 0.95);
+      border-radius: 20px;
       padding: 18px;
-      box-shadow: var(--sombra);
+      box-shadow: var(--sombra-suave);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-box::after {
+      content: "";
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      right: -18px;
+      top: -18px;
+      border-radius: 50%;
+      background: rgba(43, 150, 221, 0.13);
     }
 
     .summary-box h3 {
-      margin: 0 0 8px;
-      color: var(--azul-escuro);
-      font-size: 15px;
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
     }
 
     .summary-box strong {
-      font-size: 28px;
-      color: var(--azul-medio);
+      font-size: 31px;
+      color: var(--azul-700);
+      line-height: 1;
+    }
+
+    .summary-box span {
+      display: block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
+      background: var(--branco);
     }
 
     th,
     td {
       padding: 12px;
       text-align: left;
-      border-bottom: 1px solid var(--cinza-claro);
+      border-bottom: 1px solid var(--borda);
       font-size: 14px;
       vertical-align: top;
     }
 
     th {
-      background: var(--azul-escuro);
+      background: var(--azul-950);
       color: var(--branco);
+      font-size: 13px;
+      letter-spacing: 0.2px;
     }
 
     tr:nth-child(even) {
@@ -220,95 +306,197 @@
       padding: 5px 9px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: bold;
+      font-weight: 800;
       margin: 2px 0;
+      white-space: nowrap;
     }
 
-    .ok {
-      background: #dcfce7;
-      color: var(--verde);
-    }
-
-    .alerta {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .vencido {
-      background: #fee2e2;
-      color: var(--vermelho);
-    }
-
-    .entrada {
-      background: #dbeafe;
-      color: var(--azul-escuro);
-    }
-
-    .saida {
-      background: #f3e8ff;
-      color: #6b21a8;
-    }
-
-    .retirado {
-      background: #e5e7eb;
-      color: #374151;
-    }
+    .ok { background: var(--verde-bg); color: var(--verde); }
+    .alerta { background: var(--amarelo-bg); color: var(--amarelo); }
+    .vencido { background: var(--vermelho-bg); color: var(--vermelho); }
+    .entrada { background: #dbeafe; color: var(--azul-950); }
+    .saida { background: var(--roxo-bg); color: var(--roxo); }
+    .retirado { background: var(--cinza-bg); color: #374151; }
 
     .message {
       display: none;
       margin-top: 14px;
       padding: 12px;
       border-radius: 12px;
-      font-weight: bold;
+      font-weight: 700;
     }
 
-    .message.success {
-      display: block;
-      background: #dcfce7;
-      color: var(--verde);
-    }
-
-    .message.error {
-      display: block;
-      background: #fee2e2;
-      color: var(--vermelho);
-    }
+    .message.success { display: block; background: var(--verde-bg); color: var(--verde); }
+    .message.error { display: block; background: var(--vermelho-bg); color: var(--vermelho); }
 
     .small-note {
-      color: var(--cinza);
+      color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
+      margin: 0 0 16px;
     }
 
-    @media (max-width: 800px) {
-      .form-grid,
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
 
-      table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
+    .bar-item {
+      margin-bottom: 13px;
+    }
+
+    .bar-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: var(--texto);
+      font-weight: 700;
+    }
+
+    .bar-track {
+      height: 12px;
+      background: #eef2f7;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--azul-700), var(--azul-500));
+    }
+
+    .alert-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .alert-card {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 13px;
+      border-radius: 16px;
+      background: #f8fbff;
+      border: 1px solid var(--borda);
+    }
+
+    .alert-card strong {
+      color: var(--azul-950);
+    }
+
+    .empty-state {
+      padding: 18px;
+      border: 1px dashed var(--borda);
+      border-radius: 16px;
+      color: var(--muted);
+      background: #fbfdff;
+    }
+
+    @media (max-width: 1000px) {
+      .summary-grid,
+      .dashboard-grid,
+      .chart-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+    }
+
+    @media (max-width: 720px) {
+      .app-shell { width: 95%; margin-top: 12px; }
+      header { padding: 22px; border-radius: 22px; }
+      .tabs { border-radius: 22px; }
+      .tab-button { width: 100%; }
+      .form-grid,
+      .summary-grid,
+      .dashboard-grid,
+      .chart-grid { grid-template-columns: 1fr; }
+      .card-header { flex-direction: column; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Controle de Estoque</h1>
-    <p>Alimentos e materiais de limpeza com baixa automática por validade mais próxima</p>
-  </header>
+  <div class="app-shell">
+    <header>
+      <h1>Controle de Estoque</h1>
+      <p>Sistema moderno para alimentos e materiais de limpeza, com dashboard, validade, baixa automática/manual e histórico por unidade.</p>
+    </header>
 
-  <main>
     <div class="tabs">
-      <button class="tab-button active" onclick="openTab(event, 'entrada')">Entrada</button>
+      <button class="tab-button active" onclick="openTab(event, 'dashboard')">Dashboard</button>
+      <button class="tab-button" onclick="openTab(event, 'entrada')">Entrada</button>
       <button class="tab-button" onclick="openTab(event, 'saida')">Saída</button>
-      <button class="tab-button" onclick="openTab(event, 'resumo')">Resumo do Estoque</button>
-      <button class="tab-button" onclick="openTab(event, 'consulta')">Consulta por Produto</button>
+      <button class="tab-button" onclick="openTab(event, 'resumo')">Resumo</button>
+      <button class="tab-button" onclick="openTab(event, 'consulta')">Consulta</button>
     </div>
 
-    <section id="entrada" class="tab-content active">
+    <section id="dashboard" class="tab-content active">
+      <div class="dashboard-grid">
+        <div class="summary-box">
+          <h3>Itens disponíveis</h3>
+          <strong id="dashDisponiveis">0</strong>
+          <span>Em estoque atualmente</span>
+        </div>
+        <div class="summary-box">
+          <h3>Perto do vencimento</h3>
+          <strong id="dashProximos">0</strong>
+          <span>Validade em até 30 dias</span>
+        </div>
+        <div class="summary-box">
+          <h3>Vencidos</h3>
+          <strong id="dashVencidos">0</strong>
+          <span>Precisam de atenção</span>
+        </div>
+        <div class="summary-box">
+          <h3>Unidades retiradas</h3>
+          <strong id="dashRetirados">0</strong>
+          <span>Histórico de saídas</span>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Produtos com maior quantidade</h2>
+              <p class="small-note">Ranking dos itens disponíveis no estoque.</p>
+            </div>
+          </div>
+          <div id="graficoProdutos"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Produtos mais retirados</h2>
+              <p class="small-note">Itens com maior movimentação de saída.</p>
+            </div>
+          </div>
+          <div id="graficoSaidas"></div>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="card">
+          <h2>Alertas de validade</h2>
+          <p class="small-note">Itens vencidos ou próximos do vencimento, organizados pela data mais urgente.</p>
+          <div id="listaAlertas" class="alert-list"></div>
+        </div>
+
+        <div class="card">
+          <h2>Últimas retiradas</h2>
+          <p class="small-note">Resumo rápido das movimentações recentes de saída.</p>
+          <div id="listaUltimasSaidas" class="alert-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="entrada" class="tab-content">
       <div class="card">
         <h2>Registro de Entrada</h2>
         <p class="small-note">Cada unidade cadastrada recebe um código interno. Exemplo: se registrar 3 arroz, o sistema cria 3 unidades individuais no estoque.</p>
@@ -349,7 +537,7 @@
     <section id="saida" class="tab-content">
       <div class="card">
         <h2>Registro de Saída</h2>
-        <p class="small-note">A saída será feita somente a partir dos produtos disponíveis no estoque. O sistema baixa primeiro as unidades com validade mais próxima.</p>
+        <p class="small-note">A saída será feita somente a partir dos produtos disponíveis no estoque. No modo automático, o sistema baixa primeiro as unidades com validade mais próxima.</p>
 
         <form id="formSaida">
           <div class="form-grid">
@@ -400,7 +588,7 @@
               <input type="text" id="setorDestinoSaida" placeholder="Ex.: cozinha, sala 2, banheiro, evento" />
             </div>
 
-            <div>
+            <div class="full">
               <label for="observacaoSaida">Observação</label>
               <input type="text" id="observacaoSaida" placeholder="Ex.: retirada fora da ordem de validade" />
             </div>
@@ -420,16 +608,20 @@
     <section id="resumo" class="tab-content">
       <div class="summary-grid">
         <div class="summary-box">
-          <h3>Total de itens em estoque</h3>
+          <h3>Total em estoque</h3>
           <strong id="totalItens">0</strong>
         </div>
         <div class="summary-box">
-          <h3>Itens perto do vencimento</h3>
+          <h3>Perto do vencimento</h3>
           <strong id="totalProximos">0</strong>
         </div>
         <div class="summary-box">
-          <h3>Itens vencidos</h3>
+          <h3>Vencidos</h3>
           <strong id="totalVencidos">0</strong>
+        </div>
+        <div class="summary-box">
+          <h3>Tipos de produtos</h3>
+          <strong id="totalTipos">0</strong>
         </div>
       </div>
 
@@ -458,16 +650,20 @@
 
         <div class="summary-grid">
           <div class="summary-box">
-            <h3>Quantidade atual disponível</h3>
+            <h3>Disponíveis</h3>
             <strong id="quantidadeAtualConsulta">0</strong>
           </div>
           <div class="summary-box">
-            <h3>Unidades cadastradas</h3>
+            <h3>Cadastradas</h3>
             <strong id="entradasConsulta">0</strong>
           </div>
           <div class="summary-box">
-            <h3>Unidades retiradas</h3>
+            <h3>Retiradas</h3>
             <strong id="saidasConsulta">0</strong>
+          </div>
+          <div class="summary-box">
+            <h3>Resultado</h3>
+            <strong id="resultadoConsulta">0</strong>
           </div>
         </div>
 
@@ -506,13 +702,13 @@
           <thead>
             <tr>
               <th>Código</th>
-              <th>Data de entrada</th>
+              <th>Entrada</th>
               <th>Categoria</th>
               <th>Produto</th>
               <th>Validade</th>
               <th>Status</th>
               <th>Situação</th>
-              <th>Data da saída</th>
+              <th>Saída</th>
               <th>Responsável</th>
               <th>Finalidade</th>
             </tr>
@@ -521,7 +717,7 @@
         </table>
       </div>
     </section>
-  </main>
+  </div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhzMf4cS3hh1hDv-xiFn3ShYN_-PkZET7olV5QSDA4rns9RVy0bdQYv7Ocz3vhkuWy-Q/exec";
@@ -535,9 +731,15 @@
       document.getElementById(tabId).classList.add("active");
       event.target.classList.add("active");
 
+      atualizarTudo();
       if (tabId === "saida") carregarProdutosDisponiveisSaida();
-      if (tabId === "resumo") atualizarResumo();
       if (tabId === "consulta") consultarProduto();
+    }
+
+    function atualizarTudo() {
+      carregarProdutosDisponiveisSaida();
+      atualizarResumo();
+      atualizarDashboard();
     }
 
     function salvarUnidades() {
@@ -549,10 +751,7 @@
     }
 
     async function enviarParaPlanilha(dados) {
-      if (!SCRIPT_URL || SCRIPT_URL === "COLE_AQUI_A_URL_DO_APPS_SCRIPT") {
-        console.warn("URL do Apps Script ainda não configurada. O dado foi salvo apenas no navegador.");
-        return;
-      }
+      if (!SCRIPT_URL) return;
 
       await fetch(SCRIPT_URL, {
         method: "POST",
@@ -591,7 +790,10 @@
           status: "Disponível",
           dataSaida: "",
           finalidade: "",
-          responsavel: ""
+          responsavel: "",
+          setorDestino: "",
+          observacao: "",
+          modoSaida: ""
         };
 
         unidades.push(unidade);
@@ -606,14 +808,17 @@
           validade: unidade.validade,
           status: unidade.status,
           finalidade: "",
-          responsavel: ""
+          responsavel: "",
+          setorDestino: "",
+          observacao: "",
+          modoSaida: ""
         });
       }
 
       salvarUnidades();
       mostrarMensagem("msgEntrada", `${quantidade} unidade(s) cadastrada(s) com sucesso.`, "success");
       this.reset();
-      carregarProdutosDisponiveisSaida();
+      atualizarTudo();
     });
 
     function getProdutosDisponiveisAgrupados() {
@@ -645,7 +850,10 @@
 
     function carregarProdutosDisponiveisSaida() {
       const select = document.getElementById("produtoSaida");
+      if (!select) return;
+
       const produtos = getProdutosDisponiveisAgrupados();
+      const valorAtual = select.value;
 
       select.innerHTML = `<option value="">Selecione um produto</option>`;
 
@@ -656,14 +864,17 @@
         select.appendChild(option);
       });
 
+      select.value = valorAtual;
       atualizarInfoProdutoSaida();
     }
 
     function atualizarInfoProdutoSaida() {
-      const chave = document.getElementById("produtoSaida").value;
-      const modoSaida = document.getElementById("modoSaida").value;
-      const produto = getProdutosDisponiveisAgrupados().find(item => item.chave === chave);
+      const chave = document.getElementById("produtoSaida")?.value;
+      const modoSaida = document.getElementById("modoSaida")?.value;
       const loteSelect = document.getElementById("loteSaida");
+      if (!loteSelect) return;
+
+      const produto = getProdutosDisponiveisAgrupados().find(item => item.chave === chave);
 
       loteSelect.innerHTML = `<option value="">Selecione o produto primeiro</option>`;
       loteSelect.disabled = modoSaida !== "manual";
@@ -706,10 +917,7 @@
         .filter(item => item.status === "Disponível" && item.categoria === categoria && item.tipo === tipo)
         .forEach(item => {
           if (!lotes[item.validade]) {
-            lotes[item.validade] = {
-              validade: item.validade,
-              quantidade: 0
-            };
+            lotes[item.validade] = { validade: item.validade, quantidade: 0 };
           }
           lotes[item.validade].quantidade++;
         });
@@ -765,7 +973,6 @@
           mostrarMensagem("msgSaida", "Selecione a validade/lote para a saída manual.", "error");
           return;
         }
-
         disponiveis = disponiveis.filter(item => item.validade === validadeManual);
       }
 
@@ -805,36 +1012,22 @@
       salvarUnidades();
       mostrarMensagem("msgSaida", `${quantidadeParaSair} unidade(s) retirada(s) do estoque com sucesso.`, "success");
       this.reset();
-      carregarProdutosDisponiveisSaida();
-      atualizarResumo();
+      atualizarTudo();
     });
 
     function atualizarResumo() {
       const disponiveis = unidades.filter(item => item.status === "Disponível");
-      const agrupados = {};
-
-      disponiveis.forEach(item => {
-        const chave = `${item.categoria}|${item.tipo}`;
-        if (!agrupados[chave]) {
-          agrupados[chave] = {
-            categoria: item.categoria,
-            tipo: item.tipo,
-            unidades: []
-          };
-        }
-        agrupados[chave].unidades.push(item);
-      });
-
+      const agrupados = agruparDisponiveisPorProduto(disponiveis);
       const tabela = document.getElementById("tabelaResumo");
-      tabela.innerHTML = "";
+      if (!tabela) return;
 
+      tabela.innerHTML = "";
       let totalItens = 0;
       let totalProximos = 0;
       let totalVencidos = 0;
 
       Object.values(agrupados).forEach(produto => {
         produto.unidades.sort((a, b) => new Date(a.validade) - new Date(b.validade));
-
         const contagem = { ok: 0, alerta: 0, vencido: 0 };
 
         produto.unidades.forEach(item => {
@@ -864,22 +1057,162 @@
       document.getElementById("totalItens").textContent = totalItens;
       document.getElementById("totalProximos").textContent = totalProximos;
       document.getElementById("totalVencidos").textContent = totalVencidos;
+      document.getElementById("totalTipos").textContent = Object.keys(agrupados).length;
 
       if (!tabela.innerHTML) {
         tabela.innerHTML = `<tr><td colspan="5">Nenhum item disponível em estoque no momento.</td></tr>`;
       }
     }
 
+    function agruparDisponiveisPorProduto(lista) {
+      const agrupados = {};
+      lista.forEach(item => {
+        const chave = `${item.categoria}|${item.tipo}`;
+        if (!agrupados[chave]) {
+          agrupados[chave] = { categoria: item.categoria, tipo: item.tipo, unidades: [] };
+        }
+        agrupados[chave].unidades.push(item);
+      });
+      return agrupados;
+    }
+
+    function atualizarDashboard() {
+      const disponiveis = unidades.filter(item => item.status === "Disponível");
+      const retirados = unidades.filter(item => item.status === "Retirado");
+      let proximos = 0;
+      let vencidos = 0;
+
+      disponiveis.forEach(item => {
+        const situacao = verificarValidade(item.validade);
+        if (situacao.classe === "alerta") proximos++;
+        if (situacao.classe === "vencido") vencidos++;
+      });
+
+      document.getElementById("dashDisponiveis").textContent = disponiveis.length;
+      document.getElementById("dashProximos").textContent = proximos;
+      document.getElementById("dashVencidos").textContent = vencidos;
+      document.getElementById("dashRetirados").textContent = retirados.length;
+
+      renderizarGraficoProdutos(disponiveis);
+      renderizarGraficoSaidas(retirados);
+      renderizarAlertas(disponiveis);
+      renderizarUltimasSaidas(retirados);
+    }
+
+    function contarPorProduto(lista) {
+      const mapa = {};
+      lista.forEach(item => {
+        const nome = item.tipo;
+        mapa[nome] = (mapa[nome] || 0) + 1;
+      });
+      return Object.entries(mapa)
+        .map(([nome, quantidade]) => ({ nome, quantidade }))
+        .sort((a, b) => b.quantidade - a.quantidade)
+        .slice(0, 6);
+    }
+
+    function renderizarBarras(containerId, dados, vazioTexto) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = "";
+
+      if (!dados.length) {
+        container.innerHTML = `<div class="empty-state">${vazioTexto}</div>`;
+        return;
+      }
+
+      const max = Math.max(...dados.map(item => item.quantidade));
+      dados.forEach(item => {
+        const percentual = max > 0 ? (item.quantidade / max) * 100 : 0;
+        const div = document.createElement("div");
+        div.className = "bar-item";
+        div.innerHTML = `
+          <div class="bar-top"><span>${item.nome}</span><span>${item.quantidade}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${percentual}%"></div></div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderizarGraficoProdutos(disponiveis) {
+      renderizarBarras("graficoProdutos", contarPorProduto(disponiveis), "Nenhum produto disponível para exibir no gráfico.");
+    }
+
+    function renderizarGraficoSaidas(retirados) {
+      renderizarBarras("graficoSaidas", contarPorProduto(retirados), "Nenhuma saída registrada ainda.");
+    }
+
+    function renderizarAlertas(disponiveis) {
+      const container = document.getElementById("listaAlertas");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const alertas = disponiveis
+        .map(item => ({ ...item, situacao: verificarValidade(item.validade), dias: diasAteValidade(item.validade) }))
+        .filter(item => item.situacao.classe === "alerta" || item.situacao.classe === "vencido")
+        .sort((a, b) => new Date(a.validade) - new Date(b.validade))
+        .slice(0, 8);
+
+      if (!alertas.length) {
+        container.innerHTML = `<div class="empty-state">Nenhum alerta de validade no momento.</div>`;
+        return;
+      }
+
+      alertas.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "alert-card";
+        div.innerHTML = `
+          <div>
+            <strong>${item.tipo}</strong><br>
+            <span class="small-note">Validade: ${formatarData(item.validade)}</span>
+          </div>
+          <span class="badge ${item.situacao.classe}">${item.situacao.texto}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderizarUltimasSaidas(retirados) {
+      const container = document.getElementById("listaUltimasSaidas");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const ultimas = [...retirados]
+        .filter(item => item.dataSaida)
+        .reverse()
+        .slice(0, 8);
+
+      if (!ultimas.length) {
+        container.innerHTML = `<div class="empty-state">Nenhuma retirada registrada ainda.</div>`;
+        return;
+      }
+
+      ultimas.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "alert-card";
+        div.innerHTML = `
+          <div>
+            <strong>${item.tipo}</strong><br>
+            <span class="small-note">${item.dataSaida} | ${item.setorDestino || "Sem destino informado"}</span>
+          </div>
+          <span class="badge retirado">Retirado</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
     function consultarProduto() {
-      const termo = document.getElementById("buscaProduto").value.trim().toLowerCase();
-      const filtroStatus = document.getElementById("filtroMovimento").value;
-      const ordemValidade = document.getElementById("ordemValidade").value;
+      const termo = document.getElementById("buscaProduto")?.value.trim().toLowerCase();
+      const filtroStatus = document.getElementById("filtroMovimento")?.value;
+      const ordemValidade = document.getElementById("ordemValidade")?.value;
       const tabela = document.getElementById("tabelaConsulta");
+      if (!tabela) return;
       tabela.innerHTML = "";
 
       document.getElementById("quantidadeAtualConsulta").textContent = 0;
       document.getElementById("entradasConsulta").textContent = 0;
       document.getElementById("saidasConsulta").textContent = 0;
+      document.getElementById("resultadoConsulta").textContent = 0;
 
       if (!termo) {
         tabela.innerHTML = `<tr><td colspan="10">Digite o nome de um produto para consultar os registros.</td></tr>`;
@@ -907,6 +1240,8 @@
       if (ordemValidade === "validadeDistante") {
         resultado.sort((a, b) => new Date(b.validade) - new Date(a.validade));
       }
+
+      document.getElementById("resultadoConsulta").textContent = resultado.length;
 
       if (resultado.length === 0) {
         tabela.innerHTML = `<tr><td colspan="10">Nenhum registro encontrado para esta busca ou filtro selecionado.</td></tr>`;
@@ -943,16 +1278,17 @@
 
     function verificarValidade(dataValidade) {
       if (!dataValidade) return { texto: "Sem validade", classe: "ok" };
+      const dias = diasAteValidade(dataValidade);
+      if (dias < 0) return { texto: "Vencido", classe: "vencido" };
+      if (dias <= 30) return { texto: "Perto de vencer", classe: "alerta" };
+      return { texto: "Dentro da validade", classe: "ok" };
+    }
 
+    function diasAteValidade(dataValidade) {
       const hoje = new Date();
       hoje.setHours(0, 0, 0, 0);
-
       const validade = new Date(dataValidade + "T00:00:00");
-      const diferencaDias = Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
-
-      if (diferencaDias < 0) return { texto: "Vencido", classe: "vencido" };
-      if (diferencaDias <= 30) return { texto: "Perto de vencer", classe: "alerta" };
-      return { texto: "Dentro da validade", classe: "ok" };
+      return Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
     }
 
     function formatarData(data) {
@@ -961,8 +1297,7 @@
       return `${dia}/${mes}/${ano}`;
     }
 
-    carregarProdutosDisponiveisSaida();
-    atualizarResumo();
+    atualizarTudo();
   </script>
 </body>
 </html>
